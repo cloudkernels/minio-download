@@ -35,8 +35,8 @@ secret_key=$3
 local_path=$4
 remote_path=$5
 
-echo "mc alias set s3 $url $access_key $secret_key"
+mc alias set s3 $url $access_key $secret_key
 ok_or_die "Could not set mc alias"
 
-echo "mc cp -r s3/$remote_path $local_path"
+mc cp -r s3/$remote_path $local_path
 ok_or_die "Could not fetch object"
