@@ -35,6 +35,8 @@ secret_key=$3
 local_path=$4
 remote_path=$5
 
+info "Will fetch $remote_path to $local_path"
+
 mc alias set s3 $url $access_key $secret_key
 ok_or_die "Could not set mc alias"
 
