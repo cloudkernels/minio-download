@@ -3,6 +3,8 @@ name: Test action
 on: push
 
 jobs:
+  uses: actions/checkout@v2
+
   download:
      runs-on: ubuntu-latest
      steps:
