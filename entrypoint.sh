@@ -25,8 +25,8 @@ ok_or_die() {
 	fi
 }
 
-if [[ $# -ne 4 ]] ; then
-	die "Insufficient number of arguments"
+if [[ $# -ne 5 ]] ; then
+	die "Usage: $0 url access_key secret_key local_path remote_path"
 fi
 
 url=$1
