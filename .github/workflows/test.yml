@@ -1,0 +1,15 @@
+name: Test action
+
+on: push
+
+jobs:
+  download:
+     runs-on: ubuntu-latest
+     steps:
+       - uses: ./
+         with:
+           url: https://s3.nubificus.com
+           access-key: ${{ secrets.AWS_ACCESS_KEY }}
+           secret-key: ${{ secrets.AWS_SECRET_KEY }}
+           local-path: "./"
+           remote-path: "github/test/test.txt"
