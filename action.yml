@@ -1,6 +1,6 @@
 # action.yml
 
-name: minio-upload
+name: minio-download
 description: "Action that lets you download objects from a MinIO server"
 inputs:
   url:
