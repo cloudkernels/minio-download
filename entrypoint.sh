@@ -40,7 +40,8 @@ info "Will fetch $remote_path to $local_path"
 mc alias set s3 $url $access_key $secret_key
 ok_or_die "Could not set mc alias"
 
-mc cp -r s3/$remote_path $local_path
+#mc cp -r s3/$remote_path $local_path
+mc find s3/$remote_path --name "*" --exec "mc cp {} $local_path"
 ok_or_die "Could not fetch object"
 
 # Fix owner of local path
