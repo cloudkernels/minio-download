@@ -44,4 +44,7 @@ mc cp -r s3/$remote_path $local_path
 ok_or_die "Could not fetch object"
 
 # Fix owner of local path
-chown -R "${ACTION_UID:-root}:${ACTION_GID:-root}" $local_path
+LOCAL_UID="${ACTION_UID:-"$(stat -c %u .)"}"
+LOCAL_GID="${ACTION_GID:-"$(stat -c %g .)"}"
+info "Setting owner/group of $local_path to ${LOCAL_UID:-root}:${LOCAL_GID:-root}"
+chown -R "${LOCAL_UID:-root}:${LOCAL_GID:-root}" "$local_path"
