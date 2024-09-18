@@ -21,7 +21,7 @@ die() {
 
 ok_or_die() {
 	if [ $? -ne 0 ]; then
-		die $1
+		die "$1"
 	fi
 }
 
@@ -37,10 +37,23 @@ remote_path=$5
 
 info "Will fetch $remote_path to $local_path"
 
-mc alias set s3 $url $access_key $secret_key
+mc alias set s3 "$url" "$access_key" "$secret_key"
 ok_or_die "Could not set mc alias"
 
-mc cp -r s3/$remote_path $local_path
+if [ "${remote_path#*'*'}" != "$remote_path" ]; then
+	# Handle remote_dir with wildcard 
+	remote_dir=$(dirname "$remote_path")
+	remote_files=$(basename "$remote_path")
+	path_depth=$(echo "$remote_dir" | awk -F"/" '{print NF-1}')
+	IFS=$'\n'
+	for p in $(mc find "s3/$remote_dir" \
+		--name "$remote_files" --maxdepth "$path_depth"); do
+			mc cp -r "$p" "$local_path";
+	done
+	unset IFS
+else
+	mc cp -r "s3/$remote_path $local_path"
+fi
 ok_or_die "Could not fetch object"
 
 # Fix owner of local path
