@@ -21,12 +21,39 @@ inputs:
     required: true
 
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  entrypoint: '/entrypoint.sh'
-  args:
-    - ${{ inputs.url }}
-    - ${{ inputs.access-key }}
-    - ${{ inputs.secret-key }}
-    - ${{ inputs.local-path }}
-    - ${{ inputs.remote-path }}
+  using: composite
+  steps:
+    - name: Setup mc
+      working-directory: /usr/local/bin
+      run: |
+        [ -n "$(which mc)" ] && exit 0
+        arch=$(dpkg --print-architecture | sed 's/armhf/arm/g')
+        sudo wget --progres=dot:binary \
+          "https://dl.min.io/client/mc/release/linux-${arch}/mc"
+        sudo chmod +x mc
+      shell: bash
+
+    - name: Setup s3 alias
+      run: |
+        mc alias set s3 "${{ inputs.url }}" \
+          "${{ inputs.access-key }}" "${{ inputs.secret-key }}"
+      shell: bash
+
+    - name: Download objects
+      run: |
+        remote_path=${{ inputs.remote-path }}
+        if [ "${remote_path#*'*'}" != "$remote_path" ]; then
+          # Handle remote_dir with wildcard 
+          remote_dir=$(dirname "$remote_path")
+          remote_files=$(basename "$remote_path")
+          path_depth=$(echo "$remote_dir" | awk -F"/" '{print NF-1}')
+          IFS=$'\n'
+          for p in $(mc find "s3/$remote_dir" \
+            --name "$remote_files" --maxdepth "$path_depth"); do
+              mc cp -r "$p" "${{ inputs.local-path }}";
+          done
+          unset IFS
+        else
+          mc cp -r "s3/$remote_path ${{ inputs.local-path }}"
+        fi
+      shell: bash
