@@ -4,13 +4,34 @@ on: push
 
 jobs:
   download:
-     runs-on: self-hosted
-     steps:
-       - uses: actions/checkout@v2
-       - uses: ./
-         with:
-           url: https://s3.nubificus.com
-           access-key: ${{ secrets.AWS_ACCESS_KEY }}
-           secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-           local-path: "./"
-           remote-path: "github/test/test.txt"
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Test single file download
+        uses: ./
+        with:
+          url: https://s3.nubificus.com
+          access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          local-path: "./"
+          remote-path: "github/minio/test1.txt"
+
+      - name: Test wildcard with extension download
+        uses: ./
+        with:
+          url: https://s3.nubificus.com
+          access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          local-path: "./"
+          remote-path: "github/minio/*.txt"
+
+      - name: Test wildcard download
+        uses: ./
+        with:
+          url: https://s3.nubificus.com
+          access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          local-path: "./"
+          remote-path: "github/minio/*"
