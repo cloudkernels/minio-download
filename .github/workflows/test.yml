@@ -16,7 +16,7 @@ jobs:
           access-key: ${{ secrets.AWS_ACCESS_KEY }}
           secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           local-path: "./"
-          remote-path: "github/minio/test1.txt"
+          remote-path: "nbfc-assets/github/minio/test1.txt"
 
       - name: Test wildcard with extension download
         uses: ./
@@ -25,7 +25,7 @@ jobs:
           access-key: ${{ secrets.AWS_ACCESS_KEY }}
           secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           local-path: "./"
-          remote-path: "github/minio/*.txt"
+          remote-path: "nbfc-assets/github/minio/*.txt"
 
       - name: Test wildcard download
         uses: ./
@@ -34,4 +34,4 @@ jobs:
           access-key: ${{ secrets.AWS_ACCESS_KEY }}
           secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           local-path: "./"
-          remote-path: "github/minio/*"
+          remote-path: "nbfc-assets/github/minio/*"
