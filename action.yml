@@ -71,20 +71,27 @@ runs:
       shell: bash
 
     - name: Download objects
+      env:
+        REMOTE_PATH: ${{ inputs.remote-path }}
+        LOCAL_PATH: ${{ inputs.local-path }}
       run: |
-        echo "Will download ${{ inputs.remote-path }} to ${{ inputs.local-path }}"
-        remote_path=${{ inputs.remote-path }}
-        if [ "${remote_path#*'*'}" != "$remote_path" ]; then
-          # Handle remote_files with wildcards 
-          remote_dir=$(dirname "$remote_path")
-          remote_files=$(basename "$remote_path")
+        echo "Will download ${REMOTE_PATH} to ${LOCAL_PATH}"
+        if [[ "$REMOTE_PATH" =~ '*' ]]; then
+          # Handle remote paths with wildcards 
+          base_path="${REMOTE_PATH%%[*?\[]*}"
+          base_path="${base_path%/*}"
+          wildcard_path="${REMOTE_PATH#"${base_path}/"}"
+
+          base_path="${base_path%/}"
+          wildcard_path="${wildcard_path%/}"
+
           IFS=$'\n'
-          for p in $(mc find "s3/$remote_dir" \
-            --maxdepth 2 --name "$remote_files" | sort -u); do
-              mc cp -r "$p" "${{ inputs.local-path }}";
+          for path in $(mc find "s3/${base_path}" --path "$wildcard_path" | \
+            sort -u); do
+            mc cp -r "${path%/}" "${LOCAL_PATH}"
           done
           unset IFS
         else
-          mc cp -r "s3/$remote_path" "${{ inputs.local-path }}"
+          mc cp -r "s3/${REMOTE_PATH}" "${LOCAL_PATH}"
         fi
       shell: bash

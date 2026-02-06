@@ -18,6 +18,15 @@ jobs:
           local-path: "./"
           remote-path: "nbfc-assets/github/minio/test1.txt"
 
+      - name: Verify files exist
+        run: |
+          if [[ -z $(find -name 'test*.txt') ]]; then
+            echo "::error::No files were downloaded"
+            exit 1
+          fi
+          rm -f test*.txt
+        shell: bash
+
       - name: Test wildcard with extension download
         uses: ./
         with:
@@ -27,6 +36,15 @@ jobs:
           local-path: "./"
           remote-path: "nbfc-assets/github/minio/*.txt"
 
+      - name: Verify files exist
+        run: |
+          if [[ -z $(find -name 'test*.txt') ]]; then
+            echo "::error::No files were downloaded"
+            exit 1
+          fi
+          rm -f test*.txt
+        shell: bash
+
       - name: Test wildcard download
         uses: ./
         with:
@@ -34,4 +52,13 @@ jobs:
           access-key: ${{ secrets.AWS_ACCESS_KEY }}
           secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           local-path: "./"
-          remote-path: "nbfc-assets/github/minio/*"
+          remote-path: "nbfc-assets/github/minio*/*"
+
+      - name: Verify files exist
+        run: |
+          if [[ -z $(find -name 'test*.txt') ]]; then
+            echo "::error::No files were downloaded"
+            exit 1
+          fi
+          rm -f test*.txt
+        shell: bash
