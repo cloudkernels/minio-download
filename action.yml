@@ -35,28 +35,28 @@ runs:
 
     - name: Download latest mc SHA256
       id: mc-sha
-      if: ${{ steps.check-mc.outputs.exists == 'false' }}
+      if: steps.check-mc.outputs.exists == 'false'
       run: |
         arch=$(dpkg --print-architecture | sed 's/armhf/arm/g')
         sha=$(wget -qO- \
-          https://dl.min.io/client/mc/release/linux-"${arch}"/mc.sha256sum \
+          "https://dl.min.io/client/mc/release/linux-${arch}/mc.sha256sum" \
           | awk '{print $1}')
         echo "sha256=$sha" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: Cache mc binary
       id: cache-mc
-      if: ${{ steps.check-mc.outputs.exists == 'false' }}
+      if: steps.check-mc.outputs.exists == 'false'
       uses: actions/cache@v5
       with:
         path: /usr/local/bin/mc
-        key: mc-${{ steps.mc-sha.outputs.sha256 }}
+        key: "mc-${{ steps.mc-sha.outputs.sha256 }}"
 
     - name: Setup mc
       working-directory: /usr/local/bin
       if: >-
-        ${{ steps.check-mc.outputs.exists == 'false'
-          && steps.cache-mc.outputs.cache-hit != 'true' }}
+        steps.check-mc.outputs.exists == 'false' &&
+        steps.cache-mc.outputs.cache-hit != 'true'
       run: |
         arch=$(dpkg --print-architecture | sed 's/armhf/arm/g')
         sudo wget --progres=dot:binary \
@@ -65,9 +65,11 @@ runs:
       shell: bash
 
     - name: Setup s3 alias
-      run: |
-        mc alias set s3 "${{ inputs.url }}" \
-          "${{ inputs.access-key }}" "${{ inputs.secret-key }}"
+      env:
+        URL: ${{ inputs.url }}
+        ACCESS_KEY: ${{ inputs.access-key }}
+        SECRET_KEY: ${{ inputs.secret-key }}
+      run: mc alias set s3 "$URL" "$ACCESS_KEY" "$SECRET_KEY"
       shell: bash
 
     - name: Download objects
@@ -86,7 +88,7 @@ runs:
           wildcard_path="${wildcard_path%/}"
 
           IFS=$'\n'
-          for path in $(mc find "s3/${base_path}" --path "$wildcard_path" | \
+          for path in $(mc find "s3/${base_path}" --path "$wildcard_path" |
             sort -u); do
             mc cp -r "${path%/}" "${LOCAL_PATH}"
           done
