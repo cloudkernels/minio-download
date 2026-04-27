@@ -20,7 +20,7 @@ jobs:
 
       - name: Verify files exist
         run: |
-          if [[ -z $(find -name 'test*.txt') ]]; then
+          if [[ -z $(find . -name 'test*.txt') ]]; then
             echo "::error::No files were downloaded"
             exit 1
           fi
@@ -38,7 +38,7 @@ jobs:
 
       - name: Verify files exist
         run: |
-          if [[ -z $(find -name 'test*.txt') ]]; then
+          if [[ -z $(find . -name 'test*.txt') ]]; then
             echo "::error::No files were downloaded"
             exit 1
           fi
@@ -56,7 +56,7 @@ jobs:
 
       - name: Verify files exist
         run: |
-          if [[ -z $(find -name 'test*.txt') ]]; then
+          if [[ -z $(find . -name 'test*.txt') ]]; then
             echo "::error::No files were downloaded"
             exit 1
           fi
